@@ -278,25 +278,23 @@ el.error = {
 
 <dom-module id="eco-json-schema-object">
 
-  <!--<link rel="import" href="./eco-json-schema-array.html" />
-    <link rel="import" href="./eco-json-schema-boolean.html" />
-    <link rel="import" href="./eco-json-schema-enum.html" />
-    <link rel="import" href="./eco-json-schema-file.html" />
-    <link rel="import" href="./eco-json-schema-geolocation.html" />-->
+  <link rel="import" href="./eco-json-schema-array.html" />
+  <link rel="import" href="./eco-json-schema-boolean.html" />
+  <link rel="import" href="./eco-json-schema-enum.html" />
+  <link rel="import" href="./eco-json-schema-file.html" />
+  <link rel="import" href="./eco-json-schema-geolocation.html" />
   <link rel="import" href="./eco-json-schema-input.html" />
-  <link rel="import" href="./eco-json-schema-reference.html" />
 
   <template>
 
-    <style include="iron-flex-layout">
+    <style is="custom-style" include="iron-flex iron-flex-alignment">
       #form {
         display: block;
-        @apply --layout-vertical;
-        @apply --layout-wrap;
+        @apply(--eco-json-schema-object-form);
+        @apply(--layout-vertical);
+        @apply(--layout-wrap);
       }
     </style>
-
-
 
     <template is="dom-if" if={{!wizard}}>
       <div class="header" hidden$="[[!label]]">[[label]]</div>
@@ -308,66 +306,42 @@ el.error = {
   </template>
 
   <script>
-
-    class EcoJsonSchemaObject extends Polymer.Element {
-      static get is() {
-        return 'eco-json-schema-object';
-      }
-
-      static get behaviors() {
-        return [Polymer.AppLocalizeBehavior]
-      }
-
-      static get properties() {
-        return {
-          language: {
-            value: 'en'
-          },
-          resources: {
-            value: function () {
-              return {};
-            }
-          },
-          _componentLookup: {
-            type: Object,
-            value: function () {
-              return {}
-            }
-          },
-          schema: {
-            type: Object,
-            observer: '_schemaChanged'
-          },
-          label: {
-            type: String
-          },
-          value: {
-            type: Object,
-            notify: true,
-            observer: "setValue",
-            value: function () {
-              return {};
-            }
-          },
-          error: {
-            type: Object,
-            observer: '_errorChanged'
-          },
-          wizard: {
-            type: Boolean,
-            notify: true
+    Polymer({
+      is: 'eco-json-schema-object',
+      behaviors: [
+        Polymer.AppLocalizeBehavior
+      ],
+      properties: {
+        language: {
+          value: 'en'
+        },
+        resources: {
+          value: function() {
+            return {};
           }
-
-        }
-      }
-
-      connectedCallback () {
-        super.connectedCallback();
-        console.log("connected callback");
-      }
-
-      disconnectedCallback () {
-        super.disconnectedCallback();
+        },
+        schema: {
+          type: Object,
+          observer: '_schemaChanged'
+        },
+        label: {
+          type: String
+        },
+        value: {
+          type: Object,
+          notify: true,
+          value: function() { return {}; }
+        },
+        error: {
+          type: Object,
+          observer: '_errorChanged'
+        },
+        wizard: {
+          type: Boolean,
+          notify: true
+        },
+      },
+      detached: function () {
         this._clearForm();
       }
 
@@ -405,32 +379,50 @@ el.error = {
 
           if (ctx._isSchemaEnum(schema)) {
             property.component.name = property.component.name || 'eco-json-schema-enum';
-            property.value = '';
-          } else if (ctx._isSchemaReference(schema)) {
-            property.component.name = property.component.name || 'eco-json-schema-reference';
-            property.value = false;
+            if (typeof schema.value === typeof undefined) {
+              schema.value = '';
+            }
+            property.value = schema.value;
           } else if (ctx._isSchemaGeo(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-geolocation';
-            property.value = {};
+            if (typeof schema.value === typeof undefined) {
+              schema.value = {};
+            }
+            property.value = schema.value;
             property.map = true;
             if (schema.zoom !== undefined) {
               property.zoom = schema.zoom;
             }
           } else if (ctx._isSchemaBoolean(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-boolean';
-            property.value = false;
+            if (typeof schema.value === typeof undefined) {
+              schema.value = false;
+            }
+            property.value = schema.value;
           } else if (ctx._isSchemaFile(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-file';
-            property.value = {};
+            if (typeof schema.value === typeof undefined) {
+              schema.value = {};
+            }
+            property.value = schema.value;
           } else if (ctx._isSchemaValue(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-input';
-            property.value = '';
+            if (typeof schema.value === typeof undefined) {
+              schema.value = '';
+            }
+            property.value = schema.value;
           } else if (ctx._isSchemaObject(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-object';
-            property.value = {};
+            if (typeof schema.value === typeof undefined) {
+              schema.value = {};
+            }
+            property.value = schema.value;
           } else if (ctx._isSchemaArray(schema.type)) {
             property.component.name = property.component.name || 'eco-json-schema-array';
-            property.value = [];
+            if (typeof schema.value === typeof undefined) {
+              schema.value = [];
+            }
+            property.value = schema.value;
           } else {
             return console.error('Unknown property type %s', schema.type);
           }
@@ -508,28 +500,29 @@ el.error = {
         var ctx = this;
         var value = {};
         this._schemaProperties.forEach(function (property) {
-          value[property.property] = ctx._deepClone(property.value);
+          if (typeof property.value !== typeof undefined) {
+            value[property.property] = ctx._deepClone(property.value);
+          }
         });
         this.value = value;
-      }
-
-      _buildForm() {
+      },
+      _buildForm: function() {
         var ctx = this;
-        this._schemaProperties.forEach(function (property) {
-          var el = document.createElement(property.component.name);
-          el.label = property.label;
-          el.schema = property.schema;
-          el.schemaProperty = property;
-          el.language = ctx.language;
-          el.resources = ctx.resources;
+        this._schemaProperties.forEach(function(property) {
 
-          ctx._componentLookup[property.property] = el;
+          var el = ctx.create(property.component.name, {
+            label: property.label,
+            schema: property.schema,
+            schemaProperty: property,
+            language: this.language,
+            resources: this.resources
+          });
           el.setAttribute('name', property.property);
           el.className = 'flex start-justified';
-          property.value = el[property.component.valueProperty];
-          el.addEventListener(property.component.valueProperty.replace(/([A-Z])/g, '-$1').toLowerCase() + '-changed', ctx._schemaPropertyChanged.bind(ctx));
-          //ctx.listen(el, property.component.valueProperty.replace(/([A-Z])/g, '-$1').toLowerCase() + '-changed', '_schemaPropertyChanged');
-          ctx.$.form.appendChild(el);
+          // set the element's default value to be what was passed into the schema
+          el[property.component.valueProperty] = property.value;
+          ctx.listen(el, property.component.valueProperty.replace(/([A-Z])/g, '-$1').toLowerCase() + '-changed', '_schemaPropertyChanged');
+          Polymer.dom(ctx.$.form).appendChild(el);
         });
       }
 
