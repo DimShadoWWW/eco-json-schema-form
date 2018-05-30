@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html"/>
 <link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
 
 <!--
@@ -23,65 +23,68 @@ Please see the `eco-json-schema-object` documentation for further information.
   <link rel="import" href="../paper-styles/typography.html"/>
 
   <template>
+    <style is="custom-style" include="iron-flex iron-flex-alignment">
+      paper-input {
+        padding: 2px;
 
-    <style>
-
-      paper-input{ --paper-input-container:{width:300px;}; }
-
-
+        --paper-input-container-label: {
+          white-space: normal;
+          position: static;
+          font-size: 16px;
+          color: #212121;
+        }
+      }
     </style>
 
-    <paper-input class="Eco-Json-input" id="input"
+    <paper-input id="input"
                  class="flex"
                  value="{{value}}"
-                 auto-validate
-                 label="[[label]]" >
+                 auto-validate>
 
     </paper-input>
 
   </template>
 
   <script>
+    Polymer({
+      is: 'eco-json-schema-input',
+      behaviors: [
+        Polymer.AppLocalizeBehavior
+      ],
 
-    class EcoJsonSchemaInput extends Polymer.Element {
-      static get is() {
-        return 'eco-json-schema-input';
-      }
-
-      static get behaviors() {
-        return [Polymer.AppLocalizeBehavior]
-      }
-
-      static get properties() {
-        return {
-          language: {
-            value: 'en'
-          },
-          resources: {
-            value: function () {
-              return {};
-            }
-          },
-          schema: {
-            type: Object,
-            observer: '_schemaChanged'
-          },
-          value: {
-            type: String,
-            notify: true,
-            value: function () {
-              return '';
-            }
-          },
-          error: {
-            type: String,
-            observer: '_errorChanged',
-            value: null
+      properties: {
+        language: {
+          value: 'en'
+        },
+        resources: {
+          value: function() {
+            return {};
           }
+        },
+        schema: {
+          type: Object,
+          observer: '_schemaChanged'
+        },
+        value: {
+          type: String,
+          notify: true,
+          value: function () {
+            return '';
+          }
+        },
+        error: {
+          type: String,
+          observer: '_errorChanged',
+          value: null
         }
-      }
+      },
+      ready: function () {
 
-      _schemaChanged() {
+      },
+      detached: function () {
+
+      },
+      _schemaChanged: function () {
         var schema = this.schema;
         var inputEl = this.$.input;
         if (schema.required) {
@@ -132,9 +135,9 @@ Please see the `eco-json-schema-object` documentation for further information.
           }
 
           /*
-           if (schema.maxLength || schema.minLength) {
-           inputEl.charCounter = true;
-           }
+            if (schema.maxLength || schema.minLength) {
+              inputEl.charCounter = true;
+            }
            */
 
           if (schema.maxLength) {
@@ -148,24 +151,21 @@ Please see the `eco-json-schema-object` documentation for further information.
           if (schema.pattern) {
             inputEl.pattern = schema.pattern;
           }
-
         }
 
         if (schema.component && schema.component.properties) {
-          Object.keys(schema.component.properties).forEach(function (prop) {
+          Object.keys(schema.component.properties).forEach(function(prop) {
             inputEl[prop] = schema.component.properties[prop];
           });
         }
 
-        // Ravi S commenting out as we do not need label to float by default
-        //inputEl.alwaysFloatLabel = true; // label doesn't float when value not set
+        inputEl.alwaysFloatLabel = true; // label doesn't float when value not set
 
         if (schema.title) {
           inputEl.label = schema.title;
         }
-      }
-
-      _errorChanged() {
+      },
+      _errorChanged: function() {
         if (this.error) {
           this.$.input.errorMessage = this.error;
           this.$.input.invalid = true;
@@ -173,47 +173,38 @@ Please see the `eco-json-schema-object` documentation for further information.
           this.$.input.invalid = false;
           this.$.input.errorMessage = null;
         }
-      }
-
-      _isSchemaValue(type) {
+      },
+      _isSchemaValue: function (type) {
         return this._isSchemaBoolean(type) || this._isSchemaNumber(type) || this._isSchemaString(type);
-      }
-
-      _isSchemaBoolean(type) {
+      },
+      _isSchemaBoolean: function (type) {
         if (Array.isArray(type)) {
           return type.indexOf('boolean') !== -1;
         } else {
           return type === 'boolean';
         }
-      }
-
-      _isSchemaNumber(type) {
+      },
+      _isSchemaNumber: function(type) {
         if (Array.isArray(type)) {
           return type.indexOf('number') !== -1 || type.indexOf('integer') !== -1;
         } else {
           return type === 'number' || type === 'integer';
         }
-      }
-
-      _isSchemaString(type) {
+      },
+      _isSchemaString: function (type) {
         if (Array.isArray(type)) {
           return type.indexOf('string') !== -1;
         } else {
           return type === 'string';
         }
-      }
-
-      _isSchemaObject(type) {
+      },
+      _isSchemaObject: function (type) {
         return type === 'object';
-      }
-
-      _isSchemaArray(type) {
+      },
+      _isSchemaArray: function (type) {
         return type === 'array';
       }
-
-    }
-    window.customElements.define(EcoJsonSchemaInput.is, EcoJsonSchemaInput);
-
+    });
   </script>
 
 </dom-module>

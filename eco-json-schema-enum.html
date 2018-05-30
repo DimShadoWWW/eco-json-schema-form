@@ -1,15 +1,15 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html"/>
 
 <dom-module id="eco-json-schema-enum">
 
   <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html"/>
-  <link rel="import" href="../paper-listbox/paper-listbox.html"/>
+  <link rel="import" href="../paper-menu/paper-menu.html"/>
   <link rel="import" href="../paper-item/paper-item.html"/>
   <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html"/>
 
   <template>
-    <style include="iron-flex-layout">
+    <style is="custom-style"  include="iron-flex iron-flex-alignment">
       paper-input {
         --paper-input-container-label: {
           white-space: normal;
@@ -33,11 +33,11 @@
     </style>
 
     <paper-dropdown-menu id="dropdown" class="layout horizontal vertical" value="{{value}}" required>
-      <paper-listbox id="list" class="dropdown-content" attr-for-selected="value" selected="{{value}}">
+      <paper-menu class="dropdown-content">
         <template is="dom-repeat" items="[[_items]]">
-          <paper-item class="flex" label="[[item.label]]" value="[[item.value]]">[[item.label]]</paper-item>
+          <paper-item class="flex" label="[[item]]">[[item]]</paper-item>
         </template>
-      </paper-listbox>
+      </paper-menu>
     </paper-dropdown-menu>
 
   </template>

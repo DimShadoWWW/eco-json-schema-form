@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html" />
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../iron-icons/image-icons.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icons/editor-icons.html">
@@ -293,10 +293,10 @@ el.error = {
   <link rel="import" href="./eco-json-schema-geolocation.html" />
   <link rel="import" href="./eco-json-schema-input.html" />
   <template>
-    <style include="iron-flex-layout">
+    <style is="custom-style" include="iron-flex iron-flex-alignment">
        :host {
         display: block;
-        @apply --layout-vertical;
+        @apply(--layout-vertical);
       }
 
       paper-input {
@@ -566,7 +566,9 @@ el.error = {
         });
       },
       _removePropertyEl: function(el) {
-        this.unlisten(el, el.schemaProperty.component.valueProperty.replace(/([A-Z])/g, '-$1').toLowerCase() + '-changed', '_schemaPropertyChanged');
+        if (typeof el.schemaProperty !== typeof undefined) {
+          this.unlisten(el, el.schemaProperty.component.valueProperty.replace(/([A-Z])/g, '-$1').toLowerCase() + '-changed', '_schemaPropertyChanged');
+        }
         el.schemaProperty = null;
         Polymer.dom(this.$.form).removeChild(el);
       },
@@ -685,3 +687,4 @@ el.error = {
     });
   </script>
 </dom-module>
+
